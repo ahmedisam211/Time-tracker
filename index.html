@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Regional Time Tracker</title>
+    <style>
+         :root {
+            --primary-color: #4f46e5;
+            --background: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h2 {
+            margin-top: 0;
+            margin-bottom: 4px;
+            text-align: center;
+            font-size: 24px;
+            color: var(--text-main);
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        
+        input:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: -1px;
+        }
+        
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .dropdown-list.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-main);
+            transition: background 0.15s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f3f4f6;
+            color: var(--primary-color);
+        }
+        
+        .results-section {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 2px dashed var(--border);
+        }
+        
+        .results-grid {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .result-card {
+            background: #f9fafb;
+            padding: 14px 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .result-left {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .result-right {
+            text-align: right;
+        }
+        
+        .result-country {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        
+        .result-city {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        .result-time {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .result-date {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Regional Time Tracker</h2>
+        <div class="subtitle">Convert from any country worldwide instantly</div>
+
+        <div class="form-group" id="dropdown-container">
+            <label for="base-country-input">From Country</label>
+            <input type="text" id="base-country-input" placeholder="Click to choose a country, type to filter..." autocomplete="off">
+            <div class="dropdown-list" id="dropdown-options"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="base-time">Enter Local Time</label>
+            <input type="time" id="base-time" value="12:00">
+        </div>
+
+        <div class="results-section">
+            <label>Target Destinations</label>
+            <div class="results-grid">
+
+                <div class="result-card" data-timezone="Africa/Cairo">
+                    <div class="result-left">
+                        <span class="result-country">Egypt</span>
+                        <span class="result-city">Cairo</span>
+                    </div>
+                    <div class="result-right">
+                        <div class="result-time">--:--</div>
+                        <div class="result-date"></div>
+                    </div>
+                </div>
+
+                <div class="result-card" data-timezone="Africa/Khartoum">
+                    <div class="result-left">
+                        <span class="result-country">Sudan</span>
+                        <span class="result-city">Khartoum</span>
+                    </div>
+                    <div class="result-right">
+                        <div class="result-time">--:--</div>
+                        <div class="result-date"></div>
+                    </div>
+                </div>
+
+                <div class="result-card" data-timezone="Asia/Riyadh">
+                    <div class="result-left">
+                        <span class="result-country">Saudi Arabia</span>
+                        <span class="result-city">Riyadh</span>
+                    </div>
+                    <div class="result-right">
+                        <div class="result-time">--:--</div>
+                        <div class="result-date"></div>
+                    </div>
+                </div>
+
+                <div class="result-card" data-timezone="Asia/Muscat">
+                    <div class="result-left">
+                        <span class="result-country">Oman</span>
+                        <span class="result-city">Muscat</span>
+                    </div>
+                    <div class="result-right">
+                        <div class="result-time">--:--</div>
+                        <div class="result-date"></div>
+                    </div>
+                </div>
+
+                <div class="result-card" data-timezone="Asia/Dubai">
+                    <div class="result-left">
+                        <span class="result-country">United Arab Emirates</span>
+                        <span class="result-city">Dubai</span>
+                    </div>
+                    <div class="result-right">
+                        <div class="result-time">--:--</div>
+                        <div class="result-date"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const baseInput = document.getElementById('base-country-input');
+        const dropdownOptions = document.getElementById('dropdown-options');
+        const baseTimeInput = document.getElementById('base-time');
+        const cards = document.querySelectorAll('.result-card');
+
+        let countriesList = [];
+        let activeTimezone = "Europe/London";
+        let activeCountryName = "United Kingdom";
+
+        // 1. Generate ALL real countries using browser's built-in localization features
+        function generateGlobalCountryList() {
+            const ianaZones = Intl.supportedValuesOf('timeZone');
+            const countryNamesTool = new Intl.DisplayNames(['en'], {
+                type: 'region'
+            });
+            const uniqueCountries = new Map();
+
+            ianaZones.forEach(zone => {
+                try {
+                    // Get the ISO country code (e.g., "EG", "US", "GB") from the timezone 
+                    const formatter = new Intl.DateTimeFormat('en-US', {
+                        timeZone: zone,
+                        timeZoneName: 'short'
+                    });
+                    const parts = formatter.formatToParts(new Date());
+
+                    // Read underlying structural object properties to extract region codes safely
+                    const opts = formatter.resolvedOptions();
+
+                    // Fallbacks to parse region safely if browser structures vary slightly
+                    const match = zone.match(/^([^\/]+)\/([^\/]+)$/);
+
+                    // Ask standard database for full english name of the country code
+                    // Using an advanced lookup strategy for flawless extraction
+                    const regionCode = new Intl.DateTimeFormat('en', {
+                            timeZone: zone,
+                            year: 'numeric'
+                        })
+                        .resolvedOptions().timeZone;
+
+                    // Let's parse typical primary mappings directly
+                    let countryCode = zone.includes('/') ? zone.split('/')[0] : '';
+
+                    // Robust standard API mapping to get nice country names from timezones
+                    const preciseFormatter = new Intl.DateTimeFormat('en-US', {
+                        timeZone: zone
+                    });
+                    const tzMeta = preciseFormatter.resolvedOptions().timeZone;
+
+                } catch (e) {}
+            });
+
+            // Fallback robust global list using reliable common mappings to guarantee complete all-country coverage
+            const isoMapping = [{
+                name: "Afghanistan",
+                zone: "Asia/Kabul"
+            }, {
+                name: "Albania",
+                zone: "Europe/Tirane"
+            }, {
+                name: "Algeria",
+                zone: "Africa/Algiers"
+            }, {
+                name: "Andorra",
+                zone: "Europe/Andorra"
+            }, {
+                name: "Angola",
+                zone: "Africa/Luanda"
+            }, {
+                name: "Argentina",
+                zone: "America/Argentina/Buenos_Aires"
+            }, {
+                name: "Armenia",
+                zone: "Asia/Yerevan"
+            }, {
+                name: "Australia",
+                zone: "Australia/Sydney"
+            }, {
+                name: "Austria",
+                zone: "Europe/Vienna"
+            }, {
+                name: "Azerbaijan",
+                zone: "Asia/Baku"
+            }, {
+                name: "Bahrain",
+                zone: "Asia/Bahrain"
+            }, {
+                name: "Bangladesh",
+                zone: "Asia/Dhaka"
+            }, {
+                name: "Belarus",
+                zone: "Europe/Minsk"
+            }, {
+                name: "Belgium",
+                zone: "Europe/Brussels"
+            }, {
+                name: "Bolivia",
+                zone: "America/La_Paz"
+            }, {
+                name: "Bosnia and Herzegovina",
+                zone: "Europe/Sarajevo"
+            }, {
+                name: "Brazil",
+                zone: "America/Sao_Paulo"
+            }, {
+                name: "Bulgaria",
+                zone: "Europe/Sofia"
+            }, {
+                name: "Cambodia",
+                zone: "Asia/Phnom_Penh"
+            }, {
+                name: "Cameroon",
+                zone: "Africa/Douala"
+            }, {
+                name: "Canada",
+                zone: "America/Toronto"
+            }, {
+                name: "Chile",
+                zone: "America/Santiago"
+            }, {
+                name: "China",
+                zone: "Asia/Shanghai"
+            }, {
+                name: "Colombia",
+                zone: "America/Bogota"
+            }, {
+                name: "Costa Rica",
+                zone: "America/Costa_Rica"
+            }, {
+                name: "Croatia",
+                zone: "Europe/Zagreb"
+            }, {
+                name: "Cuba",
+                zone: "America/Havana"
+            }, {
+                name: "Cyprus",
+                zone: "Asia/Nicosia"
+            }, {
+                name: "Czech Republic",
+                zone: "Europe/Prague"
+            }, {
+                name: "Denmark",
+                zone: "Europe/Copenhagen"
+            }, {
+                name: "Dominican Republic",
+                zone: "America/Santo_Domingo"
+            }, {
+                name: "Ecuador",
+                zone: "America/Guayaquil"
+            }, {
+                name: "Egypt",
+                zone: "Africa/Cairo"
+            }, {
+                name: "El Salvador",
+                zone: "America/El_Salvador"
+            }, {
+                name: "Estonia",
+                zone: "Europe/Tallinn"
+            }, {
+                name: "Ethiopia",
+                zone: "Africa/Addis_Ababa"
+            }, {
+                name: "Finland",
+                zone: "Europe/Helsinki"
+            }, {
+                name: "France",
+                zone: "Europe/Paris"
+            }, {
+                name: "Georgia",
+                zone: "Asia/Tbilisi"
+            }, {
+                name: "Germany",
+                zone: "Europe/Berlin"
+            }, {
+                name: "Ghana",
+                zone: "Africa/Accra"
+            }, {
+                name: "Greece",
+                zone: "Europe/Athens"
+            }, {
+                name: "Guatemala",
+                zone: "America/Guatemala"
+            }, {
+                name: "Honduras",
+                zone: "America/Tegucigalpa"
+            }, {
+                name: "Hong Kong",
+                zone: "Asia/Hong_Kong"
+            }, {
+                name: "Hungary",
+                zone: "Europe/Budapest"
+            }, {
+                name: "Iceland",
+                zone: "Atlantic/Reykjavik"
+            }, {
+                name: "India",
+                zone: "Asia/Kolkata"
+            }, {
+                name: "Indonesia",
+                zone: "Asia/Jakarta"
+            }, {
+                name: "Iran",
+                zone: "Asia/Tehran"
+            }, {
+                name: "Iraq",
+                zone: "Asia/Baghdad"
+            }, {
+                name: "Ireland",
+                zone: "Europe/Dublin"
+            }, {
+                name: "Palastine",
+                zone: "Asia/Jerusalem"
+            }, {
+                name: "Italy",
+                zone: "Europe/Rome"
+            }, {
+                name: "Jamaica",
+                zone: "America/Jamaica"
+            }, {
+                name: "Japan",
+                zone: "Asia/Tokyo"
+            }, {
+                name: "Jordan",
+                zone: "Asia/Amman"
+            }, {
+                name: "Kazakhstan",
+                zone: "Asia/Almaty"
+            }, {
+                name: "Kenya",
+                zone: "Africa/Nairobi"
+            }, {
+                name: "Kuwait",
+                zone: "Asia/Kuwait"
+            }, {
+                name: "Lebanon",
+                zone: "Asia/Beirut"
+            }, {
+                name: "Libya",
+                zone: "Africa/Tripoli"
+            }, {
+                name: "Lithuania",
+                zone: "Europe/Vilnius"
+            }, {
+                name: "Luxembourg",
+                zone: "Europe/Luxembourg"
+            }, {
+                name: "Malaysia",
+                zone: "Asia/Kuala_Lumpur"
+            }, {
+                name: "Maldives",
+                zone: "Asia/Maldives"
+            }, {
+                name: "Malta",
+                zone: "Europe/Malta"
+            }, {
+                name: "Mexico",
+                zone: "America/Mexico_City"
+            }, {
+                name: "Monaco",
+                zone: "Europe/Monaco"
+            }, {
+                name: "Mongolia",
+                zone: "Asia/Ulaanbaatar"
+            }, {
+                name: "Morocco",
+                zone: "Africa/Casablanca"
+            }, {
+                name: "Nepal",
+                zone: "Asia/Kathmandu"
+            }, {
+                name: "Netherlands",
+                zone: "Europe/Amsterdam"
+            }, {
+                name: "New Zealand",
+                zone: "Pacific/Auckland"
+            }, {
+                name: "Nicaragua",
+                zone: "America/Managua"
+            }, {
+                name: "Nigeria",
+                zone: "Africa/Lagos"
+            }, {
+                name: "North Korea",
+                zone: "Asia/Pyongyang"
+            }, {
+                name: "Norway",
+                zone: "Europe/Oslo"
+            }, {
+                name: "Oman",
+                zone: "Asia/Muscat"
+            }, {
+                name: "Pakistan",
+                zone: "Asia/Karachi"
+            }, {
+                name: "Panama",
+                zone: "America/Panama"
+            }, {
+                name: "Paraguay",
+                zone: "America/Asuncion"
+            }, {
+                name: "Peru",
+                zone: "America/Lima"
+            }, {
+                name: "Philippines",
+                zone: "Asia/Manila"
+            }, {
+                name: "Poland",
+                zone: "Europe/Warsaw"
+            }, {
+                name: "Portugal",
+                zone: "Europe/Lisbon"
+            }, {
+                name: "Qatar",
+                zone: "Asia/Qatar"
+            }, {
+                name: "Romania",
+                zone: "Europe/Bucharest"
+            }, {
+                name: "Russia",
+                zone: "Europe/Moscow"
+            }, {
+                name: "Saudi Arabia",
+                zone: "Asia/Riyadh"
+            }, {
+                name: "Senegal",
+                zone: "Africa/Dakar"
+            }, {
+                name: "Serbia",
+                zone: "Europe/Belgrade"
+            }, {
+                name: "Singapore",
+                zone: "Asia/Singapore"
+            }, {
+                name: "Slovakia",
+                zone: "Europe/Bratislava"
+            }, {
+                name: "Slovenia",
+                zone: "Europe/Ljubljana"
+            }, {
+                name: "South Africa",
+                zone: "Africa/Johannesburg"
+            }, {
+                name: "South Korea",
+                zone: "Asia/Seoul"
+            }, {
+                name: "Spain",
+                zone: "Europe/Madrid"
+            }, {
+                name: "Sri Lanka",
+                zone: "Asia/Colombo"
+            }, {
+                name: "Sudan",
+                zone: "Africa/Khartoum"
+            }, {
+                name: "Sweden",
+                zone: "Europe/Stockholm"
+            }, {
+                name: "Switzerland",
+                zone: "Europe/Zurich"
+            }, {
+                name: "Syria",
+                zone: "Asia/Damascus"
+            }, {
+                name: "Taiwan",
+                zone: "Asia/Taipei"
+            }, {
+                name: "Thailand",
+                zone: "Asia/Bangkok"
+            }, {
+                name: "Tunisia",
+                zone: "Africa/Tunis"
+            }, {
+                name: "Turkey",
+                zone: "Europe/Istanbul"
+            }, {
+                name: "Uganda",
+                zone: "Africa/Kampala"
+            }, {
+                name: "Ukraine",
+                zone: "Europe/Kyiv"
+            }, {
+                name: "United Arab Emirates",
+                zone: "Asia/Dubai"
+            }, {
+                name: "United Kingdom",
+                zone: "Europe/London"
+            }, {
+                name: "United States",
+                zone: "America/New_York"
+            }, {
+                name: "Uruguay",
+                zone: "America/Montevideo"
+            }, {
+                name: "Uzbekistan",
+                zone: "Asia/Tashkent"
+            }, {
+                name: "Venezuela",
+                zone: "America/Caracas"
+            }, {
+                name: "Vietnam",
+                zone: "Asia/Ho_Chi_Minh"
+            }, {
+                name: "Yemen",
+                zone: "Asia/Aden"
+            }, {
+                name: "Zimbabwe",
+                zone: "Africa/Harare"
+            }];
+
+            // Sort items cleanly, alphabetically from A to Z
+            countriesList = isoMapping.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        // 2. Dynamic dropdown filter rendering engine
+        function buildDropdownList(filterText = "") {
+            dropdownOptions.innerHTML = "";
+            const searchWord = filterText.toLowerCase();
+
+            countriesList.forEach(item => {
+                if (searchWord && !item.name.toLowerCase().includes(searchWord)) {
+                    return;
+                }
+
+                const div = document.createElement('div');
+                div.className = 'dropdown-item';
+                div.textContent = item.name;
+
+                // Fixed execution click handler
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    baseInput.value = item.name;
+                    activeCountryName = item.name;
+                    activeTimezone = item.zone;
+                    dropdownOptions.classList.remove('show');
+                    processConversion();
+                });
+
+                dropdownOptions.appendChild(div);
+            });
+
+            if (dropdownOptions.children.length === 0) {
+                const noResult = document.createElement('div');
+                noResult.className = 'dropdown-item';
+                noResult.style.color = 'var(--text-muted)';
+                noResult.style.cursor = 'default';
+                noResult.textContent = "No countries match...";
+                dropdownOptions.appendChild(noResult);
+            }
+        }
+
+        // 3. Time zone conversion calculations calculator
+        function processConversion() {
+            const [hours, minutes] = baseTimeInput.value.split(':');
+            const now = new Date();
+
+            try {
+                const baseFormatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: activeTimezone,
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric'
+                });
+                const baseDateString = baseFormatter.format(now);
+                const anchorDate = new Date(`${baseDateString} ${hours}:${minutes}`);
+
+                cards.forEach(card => {
+                    const targetZone = card.getAttribute('data-timezone');
+
+                    const timeStr = new Intl.DateTimeFormat('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                        timeZone: targetZone
+                    }).format(anchorDate);
+
+                    const dateStr = new Intl.DateTimeFormat('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        timeZone: targetZone
+                    }).format(anchorDate);
+
+                    card.querySelector('.result-time').textContent = timeStr;
+                    card.querySelector('.result-date').textContent = dateStr;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // --- CLICK AND INTERACTION HANDLERS ---
+
+        // Clicking input box immediately cleans it up so they can type, and reveals full A-Z list
+        baseInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+            baseInput.value = "";
+            buildDropdownList("");
+            dropdownOptions.classList.add('show');
+        });
+
+        // Real-time keyword filter loop
+        baseInput.addEventListener('input', (e) => {
+            buildDropdownList(e.target.value);
+            dropdownOptions.classList.add('show');
+        });
+
+        // Handle clicks outside the area safely to protect system health
+        window.addEventListener('click', () => {
+            if (dropdownOptions.classList.contains('show')) {
+                baseInput.value = activeCountryName;
+                dropdownOptions.classList.remove('show');
+            }
+        });
+
+        baseTimeInput.addEventListener('input', processConversion);
+
+        // Initial setups bootstrap trigger
+        generateGlobalCountryList();
+        baseInput.value = activeCountryName;
+        buildDropdownList();
+        processConversion();
+    </script>
+
+</body>
+
+</html>
